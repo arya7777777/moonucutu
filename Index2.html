@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -614,4 +615,309 @@
     envelope.addEventListener('click', openEnvelope);
 
     envelope.addEventListener('keydown', (e) => {
-  
+      if (e.key === 'Enter' || e.key === ' ') { 
+        e.preventDefault(); 
+        openEnvelope(); 
+      }
+    });
+
+    function openEnvelope(){
+      envelope.classList.add('open');
+      openBtn.classList.add('hidden');
+      setTimeout(()=>{
+        letterModal.classList.add('show');
+        const closeBtn = document.getElementById('modalCloseBtn');
+        closeBtn && closeBtn.focus();
+      }, 560);
+    }
+
+    function closeLetterModal(){
+      letterModal.classList.remove('show');
+      envelope.classList.remove('open');
+      overlay.classList.add('hidden');
+      setTimeout(()=>{
+        overlay.style.display = 'none';
+        revealMainContent();
+      }, 620);
+    }
+
+    function revealMainContent(){
+      main.classList.add('revealed');
+      const elems = main.querySelectorAll('.reveal-stagger');
+      elems.forEach((el, i) => {
+        setTimeout(()=> el.classList.add('visible'), i * 120 + 80);
+      });
+      attemptAutoReplacePlaceholders();
+      main.setAttribute('tabindex', '-1');
+      main.focus({preventScroll:true});
+    }
+
+    // Replace placeholders automatically if file exists relative to html path
+    function replacePlaceholderWithImage(placeholderId, src){
+      const ph = document.getElementById(placeholderId);
+      if(!ph) return console.warn('Placeholder not found', placeholderId);
+      const img = document.createElement('img');
+      img.src = src; 
+      img.alt = ph.getAttribute('aria-label') || '';
+      img.style.width = '100%'; 
+      img.style.height = 'auto'; 
+      img.style.borderRadius = '10px';
+      img.loading = 'lazy';
+      ph.parentNode.replaceChild(img, ph);
+    }
+
+    function attemptAutoReplacePlaceholders(){
+      document.querySelectorAll('.img-placeholder[data-src]').forEach(ph => {
+        const src = ph.getAttribute('data-src');
+        if(!src) return;
+        const img = new Image();
+        img.src = src;
+        img.onload = ()=> replacePlaceholderWithImage(ph.id, src);
+        // if image doesn't exist -> keep placeholder
+      });
+    }
+
+    // Play message function for music
+    function playMessage(message) {
+      alert(message);
+    }
+
+    // accessibility: close overlay with Escape
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape'){
+        if(!overlay.classList.contains('hidden')){
+          closeLetterModal();
+        } else if(!document.getElementById('game-modal').classList.contains('hidden')){
+          closeGameModal();
+        } else if(document.getElementById('game-interface').classList.contains('visible')){
+          closeGame();
+        }
+      }
+    });
+
+    window.addEventListener('load', ()=>{
+      const btn = document.getElementById('openEnvelopeBtn');
+      btn && btn.focus();
+    });
+
+    /* ---------- Game functionality ---------- */
+
+    // Modal that shows initial "Start Game" card
+    function openGame(){ 
+      document.getElementById('game-modal').classList.remove('hidden'); 
+    }
+
+    function closeGameModal(){ 
+      document.getElementById('game-modal').classList.add('hidden'); 
+    }
+
+    // Elements
+    const gameInterface = document.getElementById('game-interface');
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const secretEl = document.getElementById('secret-message');
+    const restartBtn = document.getElementById('restart-game');
+    const closeGameBtn = document.getElementById('close-game');
+
+    // Game state
+    let hearts = [];
+    let score = 0;
+    const TARGET = 15;
+    let spawnInterval = null;
+    let animId = null;
+    let isPlaying = false;
+
+    // Basket properties (in canvas coordinates)
+    const BASKET_W = 64;
+    const BASKET_H = 22;
+    let basketX = (canvas.width - BASKET_W) / 2;
+
+    // Mouse/touch tracking
+    let isDragging = false;
+    let dragStartX = 0;
+
+    function drawBasket(){
+      ctx.fillStyle = '#ff90aa';
+      ctx.fillRect(basketX, canvas.height - BASKET_H - 10, BASKET_W, BASKET_H);
+
+      // Draw basket handle
+      ctx.strokeStyle = '#ff6fa1';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(basketX + BASKET_W/2, canvas.height - BASKET_H - 5, BASKET_W/2 + 5, Math.PI, 0);
+      ctx.stroke();
+    }
+
+    function drawHeart(x, y, size = 12) {
+      ctx.fillStyle = '#ff6fa1';
+      ctx.beginPath();
+      ctx.moveTo(x, y + size/4);
+      ctx.bezierCurveTo(x, y, x - size/2, y, x - size/2, y + size/4);
+      ctx.bezierCurveTo(x - size/2, y + size/2, x, y + size, x, y + size);
+      ctx.bezierCurveTo(x, y + size, x + size/2, y + size/2, x + size/2, y + size/4);
+      ctx.bezierCurveTo(x + size/2, y, x, y, x, y + size/4);
+      ctx.fill();
+    }
+
+    function spawnHeart(){
+      if (!isPlaying) return;
+      hearts.push({
+        x: Math.random() * (canvas.width - 20) + 10,
+        y: -20,
+        speed: 2 + Math.random() * 3,
+        size: 10 + Math.random() * 8
+      });
+    }
+
+    function updateGame(){
+      if (!isPlaying) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Update and draw hearts
+      for(let i = hearts.length - 1; i >= 0; i--){
+        const heart = hearts[i];
+        heart.y += heart.speed;
+
+        drawHeart(heart.x, heart.y, heart.size);
+
+        // Check collision with basket
+        if (heart.y + heart.size > canvas.height - BASKET_H - 10 &&
+            heart.y < canvas.height - 10 &&
+            heart.x + heart.size > basketX &&
+            heart.x < basketX + BASKET_W) {
+          hearts.splice(i, 1);
+          score++;
+          updateScore();
+
+          if (score >= TARGET) {
+            winGame();
+            return;
+          }
+        }
+        // Remove hearts that fall off screen
+        else if (heart.y > canvas.height + 20) {
+          hearts.splice(i, 1);
+        }
+      }
+
+      drawBasket();
+      animId = requestAnimationFrame(updateGame);
+    }
+
+    function updateScore(){
+      scoreEl.textContent = `Score: ${score} / ${TARGET}`;
+    }
+
+    function winGame(){
+      isPlaying = false;
+      clearInterval(spawnInterval);
+      cancelAnimationFrame(animId);
+
+      secretEl.innerHTML = `
+        <h3>💖 You Won! 💖</h3>
+        <p>Congratulations! You caught ${TARGET} hearts!</p>
+        <p style="font-style: italic; color: #6b4f86;">
+          "Just like how you've captured all the hearts, you've captured mine completely. 
+          Every heart you caught represents how much I love you, Nannu. 
+          You are my everything, and I can't wait to hold you in my arms again!"
+        </p>
+        <p>💕 With all my love, Your Star ✨ 💕</p>
+      `;
+      secretEl.style.display = 'block';
+    }
+
+    function startGame(){
+      closeGameModal();
+      gameInterface.classList.add('visible');
+      gameInterface.setAttribute('aria-hidden', 'false');
+
+      // Reset game state
+      hearts = [];
+      score = 0;
+      basketX = (canvas.width - BASKET_W) / 2;
+      isPlaying = true;
+
+      updateScore();
+      secretEl.style.display = 'none';
+
+      // Start spawning hearts
+      spawnInterval = setInterval(spawnHeart, 800);
+      updateGame();
+    }
+
+    function restartGame(){
+      clearInterval(spawnInterval);
+      cancelAnimationFrame(animId);
+      startGame();
+    }
+
+    function closeGame(){
+      isPlaying = false;
+      clearInterval(spawnInterval);
+      cancelAnimationFrame(animId);
+      gameInterface.classList.remove('visible');
+      gameInterface.setAttribute('aria-hidden', 'true');
+    }
+
+    // Event listeners for game controls
+    document.addEventListener('keydown', (e) => {
+      if (!isPlaying) return;
+
+      if (e.key === 'ArrowLeft' && basketX > 0) {
+        basketX = Math.max(0, basketX - 20);
+      } else if (e.key === 'ArrowRight' && basketX < canvas.width - BASKET_W) {
+        basketX = Math.min(canvas.width - BASKET_W, basketX + 20);
+      }
+    });
+
+    // Mouse/Touch controls for canvas
+    canvas.addEventListener('mousedown', (e) => {
+      if (!isPlaying) return;
+      isDragging = true;
+      const rect = canvas.getBoundingClientRect();
+      dragStartX = e.clientX - rect.left;
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isDragging || !isPlaying) return;
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const canvasMouseX = (mouseX / rect.width) * canvas.width;
+      basketX = Math.max(0, Math.min(canvas.width - BASKET_W, canvasMouseX - BASKET_W/2));
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    // Touch events
+    canvas.addEventListener('touchstart', (e) => {
+      if (!isPlaying) return;
+      e.preventDefault();
+      isDragging = true;
+      const rect = canvas.getBoundingClientRect();
+      dragStartX = e.touches[0].clientX - rect.left;
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (!isDragging || !isPlaying) return;
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const touchX = e.touches[0].clientX - rect.left;
+      const canvasTouchX = (touchX / rect.width) * canvas.width;
+      basketX = Math.max(0, Math.min(canvas.width - BASKET_W, canvasTouchX - BASKET_W/2));
+    });
+
+    canvas.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      isDragging = false;
+    });
+
+    // Button event listeners
+    restartBtn.addEventListener('click', restartGame);
+    closeGameBtn.addEventListener('click', closeGame);
+  </script>
+</body>
+</html>
