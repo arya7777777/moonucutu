@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>I'm Miss You Nannu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Caveat:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+    
+  
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Envelope Screen -->
+    <section class="welcome-section">
+      <img src="hello-kitty-bear.png" class="kitty-top" alt="Hello Kitty with bear"/>
+      <div id="envelope" class="envelope">
+        <div class="envelope-flap"></div>
+        <div class="envelope-body"></div>
+        <div class="envelope-seal"><span>💖</span></div>
+      </div>
+      <button class="open-btn" onclick="openEnvelope()">✨ Click to open ✨</button>
+    </section>
+
+    <!-- Letter Modal -->
+    <div id="letter-modal" class="modal hidden">
+      <div class="modal-content letter-card">
+        <button class="modal-close" onclick="closeLetterModal()">×</button>
+        <div class="letter-header">
+          <span class="heart pink">💗</span>
+          <span class="dear">Dear Nannu
+          </span>
+          <span class="heart purple">💜</span>
+        </div>
+        <div class="letter-body">
+          <p>“I want to say, from the depths of my heart, I miss you every moment and am sorry for my mistakes. You are my everything.”</p>
+          <p class="love">With all my love,<br>
+          Your Star  ✨</p>
+        </div>
+        <div class="letter-footer">
+          <span>💙</span> <span>💖</span> <span>💜</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Songs Section -->
+    <section class="card music-card">
+      <div class="music-icon"><span>🎵</span></div>
+      <h2 class="section-title">Songs For You</h2>
+      <p class="section-desc">These tunes always reminds of us . ✨</p>
+      <ul class="song-list">
+        <li><span>🎧</span> Zara Zara <button class="play-btn">▶</button></li>
+        <li><span>🌈</span> Tere Liye  <button class="play-btn">▶</button></li>
+        <li><span>🌹</span> Maand <button class="play-btn">▶</button></li>
+      </ul>
+      <button class="play-all-btn">Play All</button>
+    </section>
+
+    <!-- Game Card -->
+    <section class="card game-card">
+      <div class="game-icon"><span>💖</span></div>
+      <h2>Play a Game!</h2>
+      <p>Collect hearts for a new surprise!</p>
+      <button class="start-game-btn" onclick="openGame()">Catch Hearts!</button>
+    </section>
+
+    <!-- Game Modal -->
+    <div id="game-modal" class="modal hidden">
+      <div class="modal-content game-popup">
+        <button class="modal-close" onclick="closeGameModal()">×</button>
+        <h2>Catch Hearts & Kitty!</h2>
+        <p>Collect 15 hearts before time runs out. Tap any Star  for bonus hearts!</p>
+        <button class="start-actual-game-btn" onclick="startGame()">Start Game</button>
+      </div>
+    </div>
+
+    <!-- Game Interface Modal -->
+    <div id="game-interface" class="modal hidden">
+      <div class="modal-content heart-game-board">
+        <button class="modal-close" onclick="closeGameInterface()">×</button>
+        <div class="game-status">
+          <span id="score-label">Score: 0/15</span>
+          <span id="timer-label">Time: 30s</span>
+        </div>
+        <div class="game-area" id="game-area"></div>
+      </div>
+    </div>
+
+    <!-- Messages & Images Section -->
+    <section class="msg-section">
+      <div class="msg-card">
+        <div class="msg-bubble"> you  know I miss you too much its very difficult to stay without you  ...</div>
+        <img src="Starmissyou.png" alt="Love you Nannu"/>
+        <div class="msg-caption">I hope you return soon.</div>
+      </div>
+      <div class="msg-card">
+        <div class="msg-bubble">I regret my careless mistakes and the pain they caused.</div>
+        <img src="cat-warning.jpg" alt="Cat with sign"/>
+        <div class="msg-caption">I'm truly sorry and promise to do better.</div>
+      </div>
+    </section>
+
+    <!-- Apology in Verse -->
+    <section class="poem-card">
+      <h2>Some Words ✨</h2>
+      <div class="poem-box">
+        <p>
+        You are a part of my life   without you theres no lifr<br>
+        You are ny world my universe.<br>
+        I wish we come back together soon,<br>
+        Mere pyaare moon.<br><br>
+        Mere bache i miss you,<br>
+        please apna dhyan rkha kro.<br>
+        </p>
+        <div class="poem-footer">
+          <span>💜</span> <span>✨</span> <span>💗</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final Section -->
+    <section class="msg-section">
+      <div class="msg-card">
+        <div class="msg-bubble">💙 "This is us, always."</div>
+        <img src="kitty-batman-sunset.png" alt="Kitty and Batman at sunset"/>
+        <div class="msg-caption">Don't be sad forever!</div
