@@ -2,16 +2,192 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>I'm Miss You Nannu</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Caveat:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Caveat', Arial, cursive;
+      background: linear-gradient(135deg, #93acf0 0%, #fffaf3 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #58508d;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+      animation: fadeIn 1s ease-in;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 10px 40px rgba(140,90,180,0.1);
+      border-radius: 18px;
+    }
+    @keyframes fadeIn { from { opacity: 0;} to { opacity: 1;} }
+    .welcome-section {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .kitty-top {
+      width: 120px;
+      margin-bottom: 8px;
+      animation: dropUp .7s ease;
+    }
+    @keyframes dropUp { from {transform: translateY(100px); opacity:0;} to {transform: translateY(0); opacity:1;} }
+    .envelope {
+      margin: auto;
+      width: 120px;
+      height: 80px;
+      position: relative;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+      z-index:2;
+    }
+    .envelope-flap {
+      position: absolute;
+      top: 0; left: 0;
+      width: 120px; height: 40px;
+      background: #e1e1f1;
+      border-radius: 0 0 20px 20px;
+      transform-origin: top center;
+      transition: transform .7s cubic-bezier(.77,.2,.3,1);
+    }
+    .envelope.open .envelope-flap {
+      transform: rotateX(80deg);
+    }
+    .envelope-body {
+      position: absolute;
+      top: 40px; left: 0;
+      width: 120px; height: 40px;
+      background: #ffd8eb;
+      border-radius: 0 0 25px 25px;
+      box-shadow: 0 4px 8px rgba(180,90,190,0.08);
+    }
+    .envelope-seal {
+      position: absolute;
+      top: 28px; left:calc(50% - 16px);
+      width: 32px; height: 32px;
+      background: #ffaaee;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 21px;
+      box-shadow: 0 2px 4px #9994;
+    }
+    .open-btn {
+      margin-top: 16px;
+      padding: 11px 28px;
+      background: #ff90aa;
+      border: none;
+      border-radius: 25px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.18em;
+      font-family: inherit;
+      box-shadow: 0 3px 10px #ffb9d7a8;
+      transition: background 0.2s, transform 0.2s;
+      cursor: pointer;
+      animation: pulse 2.8s infinite;
+    }
+    @keyframes pulse { 0%,100% {box-shadow:0 3px 10px #ffb9d7a8;} 50%{box-shadow:0 8px 22px #ffa6c86f;} }
+    .open-btn:active {background:#ad4c72;}
+    .modal {
+      background: rgba(60,60,70,0.18);
+      position: fixed;
+      left:0; top:0; width:100vw; height:100vh;
+      z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      animation: fadeIn .7s;
+    }
+    .modal.hidden {display:none;}
+    .modal-content {
+      background: #fff1f7;
+      border-radius: 26px;
+      padding: 28px 19px;
+      box-shadow: 0 6px 24px #521C63aa;
+      position: relative;
+      min-width:260px;
+      max-width: 97vw;
+      font-size:1.24em;
+      animation: popUp .5s;
+    }
+    @keyframes popUp { from {transform:scale(.7);opacity:0;} to {transform:scale(1);opacity:1;} }
+    .letter-header, .letter-footer {
+      font-size: 2em;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .love {font-family:'Pacifico'; font-size:1.2em;}
+    .modal-close {
+      position: absolute; top: 7px; right: 17px;
+      background: #ff90aa;
+      border-radius: 50%;
+      border: none;
+      color: #fff; font-size: 1.5em;
+      width: 32px; height: 32px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #fb48944c;
+      z-index: 1;
+    }
+    .music-card, .game-card, .poem-card, .msg-section {
+      margin: 28px auto 22px;
+      padding: 16px 9px;
+      box-shadow: 0 2px 15px #cab6e633;
+      background: #f3f4fe;
+      border-radius: 19px;
+      position: relative;
+    }
+    .section-title {
+      font-family:'Pacifico',cursive; font-size:1.1em; color:#565098; margin-bottom:8px; margin-top:2px;
+    }
+    .section-desc {margin-bottom:7px;}
+    .song-list {padding:0 0 9px 0; margin:0;}
+    .song-list li {margin:8px;font-size:1.02em;}
+    .play-btn, .play-all-btn, .start-game-btn, .start-actual-game-btn {
+      background:#9cebfc;
+      color:#5451ad;
+      border:none; border-radius:18px; font-size:1em;padding:3px 13px;
+      margin-left:5px; box-shadow:0 2px 8px #b6e6e6bb; cursor:pointer;
+      animation: pulseBtn 3s infinite;
+    }
+    @keyframes pulseBtn { 0%{background:#9cebfc;}20%{background:#d0c1fc;}100%{background:#9cebfc;} }
+    .game-card{text-align:center;}
+    .poem-card h2 {font-size:1.25em; color:#7a6caf;}
+    .poem-box{padding:11px 12px;background:#fee8ff;border-radius:11px;}
+    .msg-section {display:flex; flex-wrap:wrap; gap:12px;}
+    .msg-card {
+      background:#fff;
+      border-radius:19px;
+      box-shadow:0 2px 12px #ecd6f3a3;
+      padding:11px;flex:1;min-width:180px;max-width:44vw;
+      display:flex; flex-direction:column;align-items:center;
+      margin-bottom:12px;
+      transition:transform .18s; animation: fadeInMsg .7s;
+    }
+    @keyframes fadeInMsg {from{opacity:0;transform:translateY(30px);} to{opacity:1;transform:translateY(0);}}
+    .msg-bubble {
+      padding:7px 11px;background:#e8ecff;border-radius:13px;
+      margin-bottom:7px;font-style:italic;
+      font-size:1.03em;
+      animation: popUp .6s;
+    }
+    .msg-caption {color:#7469aa;font-size:0.91em;margin-top:7px;}
+    .msg-card img {width:90px;border-radius:9px;box-shadow:0 1px 8px #c1aafb47;margin-bottom:5px;}
+    .poem-footer span {margin-right:6px;}
+    .game-icon, .music-icon {font-size:2em;margin-bottom:4px;}
+    .game-area {min-height:60px;}
+    /* Heart catch game style placeholder */
+    #score-label,#timer-label{font-size:1.14em;color:#7a6caf;margin:4px 8px;}
+
+    /* Mobile Responsive */
+    @media (max-width: 650px) {
+      .container{max-width:97vw;}
+      .msg-card{max-width:96vw;}
+    }
+  </style>
 </head>
 <body>
-  
-    
-  
-  <!-- Main Container -->
   <div class="container">
     <!-- Envelope Screen -->
     <section class="welcome-section">
@@ -21,7 +197,7 @@
         <div class="envelope-body"></div>
         <div class="envelope-seal"><span>💖</span></div>
       </div>
-      <button class="open-btn" onclick="openEnvelope()">✨ Click to open ✨</button>
+      <button id="openEnvelopeBtn" class="open-btn" onclick="openEnvelope()">✨ Click to open ✨</button>
     </section>
 
     <!-- Letter Modal -->
@@ -30,8 +206,7 @@
         <button class="modal-close" onclick="closeLetterModal()">×</button>
         <div class="letter-header">
           <span class="heart pink">💗</span>
-          <span class="dear">Dear Nannu
-          </span>
+          <span class="dear">Dear Nannu</span>
           <span class="heart purple">💜</span>
         </div>
         <div class="letter-body">
@@ -51,11 +226,11 @@
       <h2 class="section-title">Songs For You</h2>
       <p class="section-desc">These tunes always reminds of us . ✨</p>
       <ul class="song-list">
-        <li><span>🎧</span> Zara Zara <button class="play-btn">▶</button></li>
-        <li><span>🌈</span> Tere Liye  <button class="play-btn">▶</button></li>
-        <li><span>🌹</span> Maand <button class="play-btn">▶</button></li>
+        <li><span>🎧</span> Zara Zara <button class="play-btn" onclick="alert('Play Zara Zara')">▶</button></li>
+        <li><span>🌈</span> Tere Liye <button class="play-btn" onclick="alert('Play Tere Liye')">▶</button></li>
+        <li><span>🌹</span> Maand <button class="play-btn" onclick="alert('Play Maand')">▶</button></li>
       </ul>
-      <button class="play-all-btn">Play All</button>
+      <button class="play-all-btn" onclick="alert('Play All Songs!')">Play All</button>
     </section>
 
     <!-- Game Card -->
@@ -91,7 +266,7 @@
     <!-- Messages & Images Section -->
     <section class="msg-section">
       <div class="msg-card">
-        <div class="msg-bubble"> you  know I miss you too much its very difficult to stay without you  ...</div>
+        <div class="msg-bubble">you know I miss you too much its very difficult to stay without you ...</div>
         <img src="Starmissyou.png" alt="Love you Nannu"/>
         <div class="msg-caption">I hope you return soon.</div>
       </div>
@@ -125,4 +300,42 @@
       <div class="msg-card">
         <div class="msg-bubble">💙 "This is us, always."</div>
         <img src="kitty-batman-sunset.png" alt="Kitty and Batman at sunset"/>
-        <div class="msg-caption">Don't be sad forever!</div
+        <div class="msg-caption">Don't be sad forever!</div>
+      </div>
+    </section>
+  </div>
+  <script>
+    // Envelope animation logic
+    function openEnvelope() {
+      document.getElementById('envelope').classList.add('open');
+      setTimeout(() => {
+        document.getElementById('letter-modal').classList.remove('hidden');
+      }, 900);
+      document.getElementById('openEnvelopeBtn').style.display = 'none';
+    }
+    function closeLetterModal() {
+      document.getElementById('letter-modal').classList.add('hidden');
+      document.getElementById('envelope').classList.remove('open');
+      setTimeout(() => {
+        document.getElementById('openEnvelopeBtn').style.display = 'inline-block';
+      }, 800);
+    }
+    // Game modal logic (placeholder)
+    function openGame() {
+      document.getElementById('game-modal').classList.remove('hidden');
+    }
+    function closeGameModal() {
+      document.getElementById('game-modal').classList.add('hidden');
+    }
+    function startGame() {
+      document.getElementById('game-modal').classList.add('hidden');
+      document.getElementById('game-interface').classList.remove('hidden');
+      // You can add heart catch logic below!
+    }
+    function closeGameInterface() {
+      document.getElementById('game-interface').classList.add('hidden');
+    }
+  </script>
+</body>
+  </html>
+        
